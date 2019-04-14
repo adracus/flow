@@ -1,3 +1,8 @@
+// Package flow provides concurrency primitives for Go.
+//
+// The core assumption is that all functions suffice the `Func` type
+// definition. Currently, if you ever require to handle moving values
+// between the functions, you should make use of proper 'closurization'.
 package flow
 
 import (
