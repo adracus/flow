@@ -124,19 +124,14 @@ func Race(ctx context.Context, fns ...Func) error {
 
 	for _, fn := range fns {
 		go func(fn Func) {
+			defer cancel()
 			defer wg.Done()
-			err := fn(ctx)
-			errors <- err
-			if err != nil {
-				cancel()
-			}
+			errors <- fn(ctx)
 		}(fn)
 	}
 
 	err := <-errors
-	go func() {
-		for range errors {
-		}
-	}()
+	for range errors {
+	}
 	return err
 }
