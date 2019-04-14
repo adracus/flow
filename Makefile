@@ -6,7 +6,10 @@ fmt:
 test:
 	go test ./...
 
+.PHONY: check
+check:
+	go vet ./...
+
 .PHONY: verify
-verify:
-	test fmt
+verify: check test fmt
 
