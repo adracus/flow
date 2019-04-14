@@ -14,24 +14,24 @@ type multiError []error
 
 // Error implements error.
 func (m multiError) Error() string {
-    var (
-    	buf strings.Builder
-        first = true
+	var (
+		buf   strings.Builder
+		first = true
 	)
-    for _, err := range m {
-    	if !first {
-            _, _= fmt.Fprintln(&buf)
+	for _, err := range m {
+		if !first {
+			_, _ = fmt.Fprintln(&buf)
 		}
-    	first = false
-    	buf.WriteString(err.Error())
+		first = false
+		buf.WriteString(err.Error())
 	}
-    return buf.String()
+	return buf.String()
 }
 
 // Errors retrieves all causes of a parallel execution.
 func Errors(err error) []error {
 	if m, ok := err.(multiError); ok {
-        return m
+		return m
 	}
 	return nil
 }
@@ -65,7 +65,7 @@ func Parallel(ctx context.Context, fns ...Func) error {
 
 	var (
 		errors = make(chan error)
-		wg sync.WaitGroup
+		wg     sync.WaitGroup
 	)
 
 	wg.Add(len(fns))
@@ -107,8 +107,8 @@ func Race(ctx context.Context, fns ...Func) error {
 	defer cancel()
 
 	var (
-        errors = make(chan error)
-        wg sync.WaitGroup
+		errors = make(chan error)
+		wg     sync.WaitGroup
 	)
 
 	wg.Add(len(fns))
@@ -120,17 +120,18 @@ func Race(ctx context.Context, fns ...Func) error {
 	for _, fn := range fns {
 		go func(fn Func) {
 			defer wg.Done()
-            err := fn(ctx)
-            errors <- err
-            if err != nil {
-            	cancel()
+			err := fn(ctx)
+			errors <- err
+			if err != nil {
+				cancel()
 			}
 		}(fn)
 	}
 
-	err := <- errors
-    go func() {
-        for range errors {}
+	err := <-errors
+	go func() {
+		for range errors {
+		}
 	}()
-    return err
+	return err
 }
